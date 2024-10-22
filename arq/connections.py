@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any, Callable, List, Optional, Tuple, Union, c
 from urllib.parse import parse_qs, urlparse
 from uuid import uuid4
 
-from redis.asyncio import ConnectionPool, Redis
+from redis.asyncio import ConnectionPool, RedisCluster
 from redis.asyncio.retry import Retry
 from redis.asyncio.sentinel import Sentinel
 from redis.exceptions import RedisError, WatchError
@@ -81,9 +81,9 @@ class RedisSettings:
 
 
 if TYPE_CHECKING:
-    BaseRedis = Redis[bytes]
+    BaseRedis = RedisCluster[bytes]
 else:
-    BaseRedis = Redis
+    BaseRedis = RedisCluster
 
 
 class ArqRedis(BaseRedis):
@@ -299,7 +299,7 @@ async def create_pool(
             return pool
 
 
-async def log_redis_info(redis: 'Redis[bytes]', log_func: Callable[[str], Any]) -> None:
+async def log_redis_info(redis: 'RedisCluster[bytes]', log_func: Callable[[str], Any]) -> None:
     async with redis.pipeline(transaction=False) as pipe:
         pipe.info(section='Server')
         pipe.info(section='Memory')
